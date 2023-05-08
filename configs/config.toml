@@ -1,0 +1,7 @@
+# This is a TOML Config for my REST-API app
+# Created by Catborisovv (c) 2020-2024
+
+# Конфигурация HTTP-Сервера
+[HttpSrv]
+Host = "localhost"
+Port = 7777
