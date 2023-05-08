@@ -11,6 +11,11 @@ type Config struct {
 		Host string
 		Port int
 	}
+	DataBase struct {
+		DB_USER string
+		DB_PASS string
+		DB_NAME string
+	}
 }
 
 func DecodeConfigTOML() (error, *Config) {

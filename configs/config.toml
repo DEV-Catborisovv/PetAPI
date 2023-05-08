@@ -5,3 +5,9 @@
 [HttpSrv]
 Host = "localhost"
 Port = 7777
+
+# Конфигурация Базы-Данных PostgreSQL
+[DataBase]
+DB_USER = "postgres"
+DB_PASS = "352066"
+DB_NAME = "PetAPI"

@@ -7,6 +7,7 @@ package main
 
 import (
 	"PetAPI/internal/app"
+	"PetAPI/pkg/database"
 	"log"
 )
 
@@ -15,4 +16,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Возникла ошибка при развертке веб-сервера:\n%v\n", err)
 	}
+
+	quit := make(chan struct{})
+	go func() {
+		quit <- struct{}{}
+	}()
+
+	<-quit
+	database.DBClose()
 }
