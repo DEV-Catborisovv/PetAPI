@@ -11,6 +11,7 @@ import (
 	"net/http"
 )
 
+// Метод запуска Вэб-Сервера (Старт-Функция)
 func Init() error {
 	// Создание экземпляра структуры конфига
 	err, config := toml.DecodeConfigTOML()
@@ -19,7 +20,7 @@ func Init() error {
 		return err
 	}
 
-	// Настройка функций обработчиков:
+	// Настройка функций обработчиков
 	http.HandleFunc("/newuser", newuser.NewUserHandler)
 
 	// Развертка HTTP-Cервера

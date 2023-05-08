@@ -9,6 +9,7 @@ import (
 	"PetAPI/internal/app"
 	"log"
 )
+
 func main() {
 	err := app.Init()
 	if err != nil {
