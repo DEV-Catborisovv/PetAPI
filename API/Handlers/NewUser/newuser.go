@@ -39,9 +39,10 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte(errJson))
 			} else {
 				// Регистрируем нового пользователя
-				err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail) VALUES ('%s', encode(digest('%s', 'sha256'), 'hex'), '%s');", nickname, pass, mail))
+				err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail, admin) VALUES ('%s', encode(digest('%s', 'sha256'), 'hex'), '%s', '0');", nickname, pass, mail))
 				if err != nil {
 					log.Fatalf("Возникла ошибка при вставке значения в таблицу базы данных:\n%v\n", err)
+					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(500)
 				}
 				w.WriteHeader(200)
@@ -49,11 +50,13 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errJson := errrorhandler.GetErrorJson(400, "Data in URL is not valid")
 			w.WriteHeader(400)
+			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(errJson))
 		}
 	} else {
 		errJson := errrorhandler.GetErrorJson(405, fmt.Sprintf("The %s method is not supported for this API method", r.Method))
 		w.WriteHeader(405)
+		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(errJson))
 	}
 }

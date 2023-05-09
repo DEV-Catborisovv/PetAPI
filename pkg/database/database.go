@@ -18,6 +18,7 @@ type User struct {
 	Name     string
 	Password string
 	Mail     string
+	Admin    int
 }
 
 // Создание активной сессии БД
@@ -61,20 +62,18 @@ func InsertData(Request string) error {
 
 // Метод получения данных пользователя
 func SelectUserData(Request string) (error, *User) {
-	u := User{}
+	UserS := User{}
 	resp, err := database.Query(Request)
 	if err != nil {
 		return err, nil
 	}
-	if resp.Next() != true {
-		return nil, nil
-	}
+
 	for resp.Next() {
-		err = resp.Scan(&u.ID, &u.Name, &u.Password, &u.Mail)
+		err = resp.Scan(&UserS.ID, &UserS.Name, &UserS.Password, &UserS.Mail, &UserS.Admin)
 		if err != nil {
 			return err, nil
 		}
 	}
 	defer resp.Close()
-	return nil, &u
+	return nil, &UserS
 }
