@@ -6,33 +6,12 @@ package newuser
 import (
 	errrorhandler "PetAPI/pkg/ErrrorHandler"
 	"PetAPI/pkg/database"
+	validdata "PetAPI/pkg/validData"
 	"fmt"
 	"log"
 	"net/http"
-	"regexp"
 	"strings"
 )
-
-// Функция валидации данных пользователя
-func dataValidation(name string) bool {
-	pattern := `^[a-zA-Z0-9]+$`
-	re := regexp.MustCompile(pattern)
-
-	if re.MatchString(name) {
-		return true
-	} else {
-		return false
-	}
-}
-
-// Функция валидации почты пользователя
-func MailValidation(mail string) bool {
-	if m, _ := regexp.MatchString(`^([\w\.\_]{2,10})@(\w{1,}).([a-z]{2,4})$`, mail); !m {
-		return true
-	} else {
-		return false
-	}
-}
 
 // Обработчик события создания нового пользователя
 func NewUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +26,7 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 		var mail string = strings.TrimSpace(r.FormValue("mail"))
 
 		// Проверка переданных данных на валидность
-		if dataValidation(nickname) == true && dataValidation(pass) == true && MailValidation(mail) && len(nickname) != 0 && len(pass) != 0 && len(mail) != 0 {
+		if validdata.DataValidation(nickname) == true && validdata.DataValidation(pass) == true && validdata.MailValidation(mail) && len(nickname) != 0 && len(pass) != 0 && len(mail) != 0 {
 			err, u := database.SelectUserData(fmt.Sprintf("SELECT * FROM users WHERE name = '%s' OR mail = '%s';", nickname, mail))
 			if err != nil {
 				log.Println(err)
@@ -60,7 +39,7 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte(errJson))
 			} else {
 				// Регистрируем нового пользователя
-				err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail) VALUES ('%s', %s, 'sha256'), '%s');", nickname, pass, mail))
+				err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail) VALUES ('%s', encode(digest('%s', 'sha256'), 'hex'), '%s');", nickname, pass, mail))
 				if err != nil {
 					log.Fatalf("Возникла ошибка при вставке значения в таблицу базы данных:\n%v\n", err)
 					w.WriteHeader(500)

@@ -4,6 +4,7 @@
 package app
 
 import (
+	autotizate "PetAPI/API/Handlers/Autotizate"
 	newuser "PetAPI/API/Handlers/NewUser"
 	toml "PetAPI/pkg/TomlDecode"
 	"fmt"
@@ -22,6 +23,7 @@ func Init() error {
 
 	// Настройка функций обработчиков
 	http.HandleFunc("/newuser", newuser.NewUserHandler)
+	http.HandleFunc("/login", autotizate.AutotizateHandler)
 
 	// Развертка HTTP-Cервера
 	var configAddr string = fmt.Sprintf("%s:%d", config.HttpSrv.Host, config.HttpSrv.Port)
