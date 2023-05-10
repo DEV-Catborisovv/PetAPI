@@ -27,26 +27,18 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 
 		// Проверка переданных данных на валидность
 		if validdata.DataValidation(nickname) == true && validdata.DataValidation(pass) == true && validdata.MailValidation(mail) && len(nickname) != 0 && len(pass) != 0 && len(mail) != 0 {
-			err, u := database.SelectUserData(fmt.Sprintf("SELECT * FROM users WHERE name = '%s' OR mail = '%s';", nickname, mail))
+			err, _ := database.SelectUserData(fmt.Sprintf("SELECT * FROM users WHERE name = '%s' OR mail = '%s';", nickname, mail))
 			if err != nil {
 				log.Println(err)
 			}
-
-			// Проверка на существование пользователя по никнейму / почте
-			if u != nil {
-				errJson := errrorhandler.GetErrorJson(409, "User already registered")
-				w.WriteHeader(409)
-				w.Write([]byte(errJson))
-			} else {
-				// Регистрируем нового пользователя
-				err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail, admin) VALUES ('%s', encode(digest('%s', 'sha256'), 'hex'), '%s', '0');", nickname, pass, mail))
-				if err != nil {
-					log.Fatalf("Возникла ошибка при вставке значения в таблицу базы данных:\n%v\n", err)
-					w.Header().Set("Content-Type", "application/json")
-					w.WriteHeader(500)
-				}
-				w.WriteHeader(200)
+			// Регистрируем нового пользователя
+			err = database.InsertData(fmt.Sprintf("INSERT INTO users (name, password, mail, admin) VALUES ('%s', encode(digest('%s', 'sha256'), 'hex'), '%s', '0');", nickname, pass, mail))
+			if err != nil {
+				log.Fatalf("Возникла ошибка при вставке значения в таблицу базы данных:\n%v\n", err)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(500)
 			}
+			w.WriteHeader(200)
 		} else {
 			errJson := errrorhandler.GetErrorJson(400, "Data in URL is not valid")
 			w.WriteHeader(400)

@@ -1,6 +1,8 @@
 // Клиент базы данных PostgreSQL
 // Created by Catborisovv (c) 2020-2024
 
+// Необходимо ввести пул соединений
+
 package database
 
 import (

@@ -26,8 +26,12 @@ type JSONResponse struct {
 
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
+		// Получение URL
 		if r.URL.Path == "/users/" {
-
+			errJson := errrorhandler.GetErrorJson(400, "Please provide a nickname in the URL")
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(errJson))
 		} else {
 			path := strings.Trim(r.URL.Path, "/")
 			pathParts := strings.Split(path, "/")
