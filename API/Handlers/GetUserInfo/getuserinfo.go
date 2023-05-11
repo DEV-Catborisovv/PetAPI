@@ -56,7 +56,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 						log.Fatalf("Возникла ошибка при выполнении SQL запроса:\n%v\n", err)
 					}
 
-					if User == nil {
+					if User.ID == 0 {
 						errJson := errrorhandler.GetErrorJson(404, "User is not found")
 						w.WriteHeader(http.StatusBadRequest)
 						w.Header().Set("Content-Type", "application/json")

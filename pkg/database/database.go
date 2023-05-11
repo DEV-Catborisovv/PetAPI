@@ -6,9 +6,6 @@
 package database
 
 import (
-	toml "PetAPI/pkg/TomlDecode"
-	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/lib/pq" // Драйвер базы данных
@@ -23,49 +20,33 @@ type User struct {
 	Admin    int
 }
 
-// Создание активной сессии БД
-var database *sql.DB = DBConnect()
-
-// Метод завершения активной сессии БД
-func DBClose() {
-	err := database.Close()
-	if err != nil {
-		log.Fatalf("Возникла ошибка при завершении активной сессии базы данных:\n%v\n", err)
-	}
-	log.Println("Сессия базы данных была завершена")
-}
-
-// Метод создания новой сессии базы данных
-func DBConnect() *sql.DB {
-	err, config := toml.DecodeConfigTOML()
-	if err != nil {
-		log.Fatalf("Возникла ошибка при подключении к БД:\n%v\n", err)
-	}
-
-	// Форматирование строки подключения
-	var dbinfo string = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", config.DataBase.DB_USER, config.DataBase.DB_PASS, config.DataBase.DB_NAME)
-	db, err := sql.Open("postgres", dbinfo)
-	if err != nil {
-		log.Fatalf("Возникла ошибка при подключении к БД:\n%v\n", err)
-	}
-	log.Printf("Была создана новая сессия базы данных: %s\n", dbinfo)
-	return db
-}
+var pool *ConnectionPool = NewConnectionPool(10)
 
 // Метод вставки данных в таблицу
 func InsertData(Request string) error {
-	insert, err := database.Query(Request)
+	db, err := pool.GetConnection()
+	if err != nil {
+		log.Printf("Возникла ошибка при получении пула:\n%v\n", err)
+	}
+
+	insert, err := db.Query(Request)
 	if err != nil {
 		return err
 	}
 	defer insert.Close()
+	defer pool.ReleaseConnection(db)
 	return nil
 }
 
 // Метод получения данных пользователя
 func SelectUserData(Request string) (error, *User) {
+	db, err := pool.GetConnection()
+	if err != nil {
+		log.Printf("Возникла ошибка при получении пула:\n%v\n", err)
+	}
+
 	UserS := User{}
-	resp, err := database.Query(Request)
+	resp, err := db.Query(Request)
 	if err != nil {
 		return err, nil
 	}
@@ -77,5 +58,6 @@ func SelectUserData(Request string) (error, *User) {
 		}
 	}
 	defer resp.Close()
+	defer pool.ReleaseConnection(db)
 	return nil, &UserS
 }
