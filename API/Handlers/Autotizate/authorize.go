@@ -40,8 +40,8 @@ func AutotizateHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println(err)
 			}
 
-			// Проверка на существование пользователя по никнейм
-			if u == nil {
+			// Проверка на существование пользователя по ID
+			if u.ID == 0 {
 				errJson := errrorhandler.GetErrorJson(404, "This user does not exist")
 				w.WriteHeader(404)
 				w.Write([]byte(errJson))

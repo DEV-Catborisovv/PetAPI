@@ -31,7 +31,7 @@ func NewUserHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// Проверка на существование пользователя
 		if u.ID == 0 {
-			errJson := errrorhandler.GetErrorJson(400, "Data in URL is not valid")
+			errJson := errrorhandler.GetErrorJson(400, "Data is not valid")
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(errJson))
 		} else {
